@@ -1,0 +1,13 @@
+{
+    "name": "navigathor",
+    "version": "1.0.0",
+    "description": "Navegador ultra ligero inspirado en Safari",
+    "main": "main.js",
+    "scripts": {
+        "start": "electron .",
+        "dev": "electron ."
+    },
+    "devDependencies": {
+        "electron": "^39.2.7"
+    }
+}

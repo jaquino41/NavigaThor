@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NavigaThor - Ultra Browser</title>
+    <link rel="stylesheet" href="style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500&display=swap"
+        rel="stylesheet">
+</head>
+
+<body class="dark-theme">
+    <!-- Sidebar Lateral -->
+    <aside class="thor-sidebar hidden" id="mainSidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <span class="logo-icon">⚡</span>
+                <div class="logo-text">NavigaThor</div>
+            </div>
+            <button class="close-sidebar" id="closeSidebar">×</button>
+        </div>
+        <div class="sidebar-content">
+            <!-- Conectar Apps -->
+            <div class="sidebar-group">
+                <label>Conectar (Apps NavigaThor)</label>
+                <div class="share-grid">
+                    <button class="share-btn whatsapp" onclick="openApp('whatsapp')" title="Entrar a WhatsApp">
+                        <img src="https://cdn.simpleicons.org/whatsapp/white" alt="WhatsApp">
+                    </button>
+                    <button class="share-btn telegram" onclick="openApp('telegram')" title="Entrar a Telegram">
+                        <img src="https://cdn.simpleicons.org/telegram/white" alt="Telegram">
+                    </button>
+                    <button class="share-btn twitter" onclick="openApp('twitter')" title="Entrar a X">
+                        <img src="https://cdn.simpleicons.org/x/white" alt="X">
+                    </button>
+                    <button class="share-btn facebook" onclick="openApp('facebook')" title="Entrar a Facebook">
+                        <img src="https://cdn.simpleicons.org/facebook/white" alt="Facebook">
+                    </button>
+                    <button class="share-btn instagram" onclick="openApp('instagram')" title="Entrar a Instagram">
+                        <img src="https://cdn.simpleicons.org/instagram/white" alt="Instagram">
+                    </button>
+                    <button class="share-btn tiktok" onclick="openApp('tiktok')" title="Entrar a TikTok">
+                        <img src="https://cdn.simpleicons.org/tiktok/white" alt="TikTok">
+                    </button>
+                    <button class="share-btn email" onclick="openApp('gmail')" title="Entrar a Gmail">
+                        <img src="https://cdn.simpleicons.org/gmail/white" alt="Email">
+                    </button>
+                </div>
+            </div>
+
+            <!-- Navegación Desplegable -->
+            <div class="sidebar-group collapsible">
+                <button class="side-item dropdown-trigger" onclick="toggleDropdown('navDropdown')">
+                    <span class="icon">🧭</span> Navegación
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="dropdown-content" id="navDropdown">
+                    <button class="side-item" id="btnHistory">
+                        <span class="icon">📜</span> Historial
+                    </button>
+                    <button class="side-item" id="btnFavorites">
+                        <span class="icon">⭐</span> Favoritos
+                    </button>
+                    <button class="side-item" id="btnDownloads">
+                        <span class="icon">📥</span> Descargas
+                    </button>
+                </div>
+            </div>
+
+            <!-- Compartir Desplegable -->
+            <div class="sidebar-group collapsible">
+                <button class="side-item dropdown-trigger" onclick="toggleDropdown('shareDropdown')">
+                    <span class="icon">📤</span> Compartir Contenido
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="dropdown-content hidden" id="shareDropdown">
+                    <div class="share-grid mini">
+                        <button class="share-btn whatsapp" onclick="shareTo('whatsapp')" title="WhatsApp">
+                            <img src="https://cdn.simpleicons.org/whatsapp/white" alt="WhatsApp">
+                        </button>
+                        <button class="share-btn telegram" onclick="shareTo('telegram')" title="Telegram">
+                            <img src="https://cdn.simpleicons.org/telegram/white" alt="Telegram">
+                        </button>
+                        <button class="share-btn twitter" onclick="shareTo('twitter')" title="X">
+                            <img src="https://cdn.simpleicons.org/x/white" alt="X">
+                        </button>
+                        <button class="share-btn facebook" onclick="shareTo('facebook')" title="Facebook">
+                            <img src="https://cdn.simpleicons.org/facebook/white" alt="Facebook">
+                        </button>
+                        <button class="share-btn instagram" onclick="shareTo('instagram')" title="Instagram">
+                            <img src="https://cdn.simpleicons.org/instagram/white" alt="Instagram">
+                        </button>
+                        <button class="share-btn tiktok" onclick="shareTo('tiktok')" title="TikTok">
+                            <img src="https://cdn.simpleicons.org/tiktok/white" alt="TikTok">
+                        </button>
+                        <button class="share-btn email" onclick="shareTo('email')" title="Email">
+                            <img src="https://cdn.simpleicons.org/gmail/white" alt="Email">
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- IA Pro Tools Desplegable -->
+            <div class="sidebar-group collapsible">
+                <button class="side-item dropdown-trigger" onclick="toggleDropdown('aiDropdown')">
+                    <span class="icon">🤖</span> IA Pro Tools
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="dropdown-content hidden" id="aiDropdown">
+                    <div class="share-grid mini">
+                        <button class="share-btn gemini" onclick="openApp('gemini')" title="Google Gemini">
+                            <img src="https://cdn.simpleicons.org/googlegemini" alt="Gemini">
+                        </button>
+                        <button class="share-btn chatgpt" onclick="openApp('chatgpt')" title="OpenAI ChatGPT">
+                            <img src="https://cdn.simpleicons.org/openai" alt="ChatGPT">
+                        </button>
+                        <button class="share-btn copilot" onclick="openApp('copilot')" title="Microsoft Copilot">
+                            <img src="https://cdn.simpleicons.org/microsoftcopilot" alt="Copilot">
+                        </button>
+                        <button class="share-btn aistudio" onclick="openApp('aistudio')" title="Google AI Studio">
+                            <img src="https://cdn.simpleicons.org/google" alt="AI Studio">
+                        </button>
+                        <button class="share-btn deepseek" onclick="openApp('deepseek')" title="DeepSeek">
+                            <img src="https://cdn.simpleicons.org/deepseek" alt="DeepSeek">
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Herramientas Pro Desplegable -->
+            <div class="sidebar-group collapsible">
+                <button class="side-item dropdown-trigger" onclick="toggleDropdown('proDropdown')">
+                    <span class="icon">🛠️</span> Herramientas Pro
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="dropdown-content" id="proDropdown">
+                    <button class="side-item" id="toggleDarkMode">
+                        <span class="icon">🌓</span> Modo Forzado Dark
+                    </button>
+                    <button class="side-item" id="capturePage">
+                        <span class="icon">📸</span> Captura de Pantalla
+                    </button>
+                    <button class="side-item" id="cleanCache">
+                        <span class="icon">🧹</span> Limpiar Caché
+                    </button>
+                    <button class="side-item" id="killApps">
+                        <span class="icon">💀</span> Matar Aplicaciones
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="sidebar-footer">
+            <div class="version">Build 1.2.5 - ThorEngine</div>
+        </div>
+    </aside>
+
+    <div class="app-container">
+        <!-- BARRA SUPERIOR: Pestañas y Controles -->
+        <header class="thor-top-bar">
+            <div class="window-controls">
+                <div class="dot close" onclick="windowControl('close')"></div>
+                <div class="dot minimize" onclick="windowControl('minimize')"></div>
+                <div class="dot maximize" onclick="windowControl('maximize')"></div>
+            </div>
+
+            <div class="header-left-tools">
+                <button class="sidebar-toggle" id="toggleSidebar">☰</button>
+                <button class="header-tool" id="toggleAppStats" title="Recursos del Sistema">📊</button>
+            </div>
+
+            <div class="tabs-container" id="tabsBar">
+                <!-- Tabs se insertan aquí -->
+                <button class="new-tab-btn" id="newTabBtn">+</button>
+            </div>
+        </header>
+
+        <!-- AREA CENTRAL: El contenido web -->
+        <main id="browserContainer">
+            <!-- Webviews de las pestañas se insertan aquí -->
+
+            <!-- App Stats Box (Como en ThorTube) -->
+            <div id="appStatsBox" class="app-stats-box hidden">
+                <div class="stats-header">📊 Comparativa de Recursos</div>
+                <div class="stats-grid">
+                    <!-- CPU Comparison -->
+                    <div class="stat-comparison">
+                        <div class="stat-item">
+                            <label>CPU Sistema</label>
+                            <div class="stat-value" id="valCpu">0%</div>
+                            <div class="stat-bar-bg">
+                                <div class="stat-bar" id="barCpu"></div>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <label>CPU NavigaThor</label>
+                            <div class="stat-value" id="valAppCpu">0%</div>
+                            <div class="stat-bar-bg">
+                                <div class="stat-bar app" id="barAppCpu"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RAM Comparison -->
+                    <div class="stat-comparison">
+                        <div class="stat-item">
+                            <label>RAM Sistema</label>
+                            <div class="stat-value" id="valRam">0%</div>
+                            <div class="stat-bar-bg">
+                                <div class="stat-bar" id="barRam"></div>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <label>RAM NavigaThor</label>
+                            <div class="stat-value" id="valAppRam">0 MB</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-item extra">
+                        <label>Estado Disco C:</label>
+                        <div class="stat-value" id="valDisk">0%</div>
+                    </div>
+                </div>
+                <button class="optimize-btn-full" id="optimizeBtn">Invocando Mjolnir ⚡</button>
+            </div>
+        </main>
+
+        <!-- BARRA INFERIOR: Solo Navegación -->
+        <footer class="thor-bottom-nav">
+            <div class="nav-controls">
+                <button class="nav-btn" id="backBtn">←</button>
+                <button class="nav-btn" id="forwardBtn">→</button>
+                <button class="nav-btn" id="reloadBtn">↻</button>
+            </div>
+
+            <div class="omnibox">
+                <div class="engine-selector">
+                    <select id="engineSelect">
+                        <option value="google">Google</option>
+                        <option value="duck">DuckDuckGo</option>
+                        <option value="bing">Bing</option>
+                        <option value="apple">Apple (Siri)</option>
+                    </select>
+                </div>
+                <input type="text" id="urlInput" placeholder="Busca con Thor o introduce URL..." spellcheck="false">
+                <button class="fav-btn" id="addFavBtn" title="Añadir a Favoritos">⭐</button>
+                <div class="loading-spinner hidden" id="loadingSpinner"></div>
+            </div>
+
+            <div class="status-info" id="statusText">Listo</div>
+        </footer>
+    </div>
+
+    <!-- Modal Toast -->
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
