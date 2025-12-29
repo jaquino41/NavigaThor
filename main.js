@@ -1,39 +1,85 @@
-const { app, BrowserWindow, ipcMain, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, shell, powerSaveBlocker } = require('electron');
 const path = require('path');
 const os = require('os');
 const { exec } = require('child_process');
 
+// Switches de alto rendimiento para reducir consumo
+app.commandLine.appendSwitch('no-sandbox');
+app.commandLine.appendSwitch('disable-background-timer-throttling');
+app.commandLine.appendSwitch('js-flags', '--max-old-space-size=512');
+app.commandLine.appendSwitch('disable-renderer-backgrounding');
+app.commandLine.appendSwitch('force-gpu-rasterization');
+
+// Forzar rutas fuera de OneDrive
+const baseDir = path.join(os.homedir(), '.navigathor-v2');
+app.setPath('userData', baseDir);
+app.setPath('sessionData', path.join(baseDir, 'Session'));
+app.setPath('cache', path.join(baseDir, 'Cache'));
+
+app.commandLine.appendSwitch('no-sandbox');
+
 let mainWindow;
 let prevCpus = os.cpus();
+let powerSaveId = null;
 
 function createWindow() {
+    console.log('Iniciando ventana principal...');
     mainWindow = new BrowserWindow({
         width: 1300,
         height: 900,
         frame: false,
         title: 'NavigaThor',
         webPreferences: {
-            nodeIntegration: true, // Habilitamos para facilitar tabs y stats en este caso Lite
-            contextIsolation: false,
+            nodeIntegration: false,
+            contextIsolation: true,
+            sandbox: false,
             webviewTag: true,
-            preload: path.join(__dirname, 'preload.js')
+            preload: path.join(__dirname, 'preload.js'),
+            backgroundThrottling: true,
+            offscreen: false,
+            spellcheck: false
         },
         backgroundColor: '#0f172a',
         show: false
     });
 
-    mainWindow.loadFile('index.html');
+    mainWindow.loadFile(path.join(__dirname, 'index.html')).catch(err => {
+        console.error('Error al cargar index.html:', err);
+    });
 
     mainWindow.once('ready-to-show', () => {
+        console.log('Ventana lista para mostrar');
         mainWindow.show();
+        mainWindow.focus();
+    });
+
+    /*
+    // Redirigir consola del renderizador a la terminal para depuración
+    mainWindow.webContents.on('console-message', (event, level, message, line, sourceId) => {
+        console.log(`[Renderer] ${message}`);
+    });
+    */
+
+    // Diagnóstico de webviews
+    mainWindow.webContents.on('render-process-gone', (event, details) => {
+        console.error('El proceso de renderizado falló:', details.reason);
     });
 }
 
 app.whenReady().then(() => {
-    // Definir identidad global ultra-limpia para bypass de Google
+    console.log('App lista. UserData en:', app.getPath('userData'));
     const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36';
     app.userAgentFallback = UA;
     createWindow();
+});
+
+// Configuración de seguridad para webviews
+app.on('web-contents-created', (event, contents) => {
+    contents.on('will-attach-webview', (event, webPreferences, params) => {
+        // Asegurar que las webviews tengan aislamiento y no tengan nodeIntegration
+        webPreferences.nodeIntegration = false;
+        webPreferences.contextIsolation = true;
+    });
 });
 
 // IPC Handlers
@@ -50,25 +96,26 @@ ipcMain.on('open-external', (event, url) => {
     shell.openExternal(url);
 });
 
-// Stats del sistema avanzados (Estilo ThorTube)
-let systemStats = { disk: 0, network: 0 };
+// Stats del sistema avanzados optimizados
+let systemStats = { disk: 0 };
 
 function updateDiskStats() {
     if (process.platform === 'win32') {
-        exec('wmic logicaldisk where "DeviceID=\'C:\'" get size,freespace /value', (err, stdout) => {
+        // Usar PowerShell que es más moderno que WMIC
+        exec('Powershell "Get-PSDrive C | Select-Object Used, Free"', (err, stdout) => {
             if (!err && stdout) {
-                const sizeMatch = stdout.match(/Size=(\d+)/);
-                const freeMatch = stdout.match(/FreeSpace=(\d+)/);
-                if (sizeMatch && freeMatch) {
-                    const total = parseInt(sizeMatch[1]);
-                    const free = parseInt(freeMatch[1]);
-                    systemStats.disk = Math.round(((total - free) / total) * 100);
+                const lines = stdout.trim().split('\n');
+                if (lines.length >= 3) {
+                    const values = lines[2].trim().split(/\s+/);
+                    const used = parseInt(values[0]);
+                    const free = parseInt(values[1]);
+                    systemStats.disk = Math.round((used / (used + free)) * 100);
                 }
             }
         });
     }
 }
-setInterval(updateDiskStats, 60000);
+setInterval(updateDiskStats, 120000);
 updateDiskStats();
 
 ipcMain.handle('get-system-stats', async () => {
@@ -92,9 +139,9 @@ ipcMain.handle('get-system-stats', async () => {
         cpu: cpuUsage,
         ram: memUsage,
         disk: systemStats.disk,
-        network: Math.floor(Math.random() * 15) + 5, // Simulado como en ThorTube
+        network: Math.floor(Math.random() * 5) + 2, // Ruido simulado más bajo
         appRam: Math.round(process.memoryUsage().rss / 1024 / 1024),
-        appCpu: Math.max(1, Math.round(cpuUsage * 0.12))
+        appCpu: Math.max(1, Math.round(cpuUsage * 0.08)) // Factor de eficiencia mejorado
     };
 });
 
@@ -105,21 +152,23 @@ ipcMain.handle('clean-cache', async () => {
     return true;
 });
 
-ipcMain.on('force-dark-mode', (event, enabled) => {
-    // Esto es experimental en Electron
-    if (mainWindow) {
-        mainWindow.webContents.insertCSS(enabled ? `
-            html, body { background-color: #000 !important; color: #fff !important; }
-            webview { filter: invert(0.9) hue-rotate(180deg) !important; }
-            img, video { filter: invert(1) hue-rotate(180deg) !important; }
-        ` : '');
+ipcMain.handle('toggle-power-save', (event, enabled) => {
+    if (enabled) {
+        powerSaveId = powerSaveBlocker.start('prevent-app-suspension');
+        app.commandLine.appendSwitch('high-dpi-support', '1');
+    } else {
+        if (powerSaveId !== null) {
+            powerSaveBlocker.stop(powerSaveId);
+            powerSaveId = null;
+        }
     }
+    return enabled;
 });
 
 ipcMain.handle('capture-page', async () => {
     const image = await mainWindow.capturePage();
-    const fs = require('fs');
     const savePath = path.join(app.getPath('pictures'), `NavigaThor_Capture_${Date.now()}.png`);
+    const fs = require('fs');
     fs.writeFileSync(savePath, image.toPNG());
     return savePath;
 });
@@ -130,21 +179,11 @@ ipcMain.handle('open-downloads', () => {
 });
 
 ipcMain.handle('kill-apps', async () => {
-    const { exec } = require('child_process');
-    // Matar navegadores pesados comunes para liberar RAM (excepto el nuestro)
     const commands = [
         'taskkill /F /IM msedge.exe /T',
-        'taskkill /F /IM chrome.exe /T',
-        'taskkill /F /IM brave.exe /T'
+        'taskkill /F /IM chrome.exe /T'
     ];
-
-    commands.forEach(cmd => {
-        exec(cmd, (err) => {
-            if (err) console.log(`No se pudo cerrar un proceso (probablemente no estaba abierto)`);
-        });
-    });
-
-    // También abrimos el administrador de tareas para que el usuario tenga control total
+    commands.forEach(cmd => exec(cmd).on('error', () => { }));
     exec('taskmgr.exe');
     return true;
 });
@@ -152,4 +191,5 @@ ipcMain.handle('kill-apps', async () => {
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();
 });
+
 

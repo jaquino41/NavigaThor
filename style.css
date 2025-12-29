@@ -115,6 +115,17 @@ body {
     text-overflow: ellipsis;
 }
 
+.tab.hibernated {
+    opacity: 0.5;
+    filter: grayscale(0.8);
+    border-style: dashed;
+}
+
+.tab.hibernated:hover {
+    opacity: 0.8;
+    filter: none;
+}
+
 .tab-close {
     font-size: 16px;
     opacity: 0.4;
@@ -534,6 +545,12 @@ webview.active {
     background: var(--accent-glow);
     border-color: var(--accent);
     transform: translateX(-5px);
+}
+
+.side-item.active {
+    background: var(--accent);
+    color: white;
+    box-shadow: 0 0 15px var(--accent-glow);
 }
 
 .share-grid {
