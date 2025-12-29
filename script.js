@@ -48,8 +48,7 @@ class Tab {
         this.webview.setAttribute('src', url);
         this.webview.className = 'tab-content';
         this.webview.id = `webview-${this.id}`;
-        this.webview.setAttribute('useragent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36');
-        this.webview.setAttribute('allowpopups', '');
+        this.webview.setAttribute('allowpopups', ''); // Necesario para ventanas de login
 
         this.addWebviewListeners();
         browserContainer.appendChild(this.webview);
